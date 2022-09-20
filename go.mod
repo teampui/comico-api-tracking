@@ -1,3 +1,3 @@
-module github.com/teampui/comico-api-tracking
+module github.com/teampui/tracking
 
 go 1.19
