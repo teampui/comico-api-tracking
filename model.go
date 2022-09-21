@@ -61,6 +61,7 @@ func SendLog(referrer string, ip string, trackingIdentifier string, version stri
 
 	log.Println("insert log")
 	log.Println("insert log2")
+	log.Println("insert log3")
 
 	agent.JSON(Tracking{
 		Referrer: referrer,
