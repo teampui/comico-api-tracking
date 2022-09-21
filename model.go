@@ -2,7 +2,6 @@ package tracking
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"time"
 
@@ -56,21 +55,10 @@ func init() {
 	req.SetRequestURI(host + "/api/v1/logs")
 }
 
-func SendLog(referrer string, ip string, trackingIdentifier string, version string) {
+func SendLog(track Tracking) {
 	// 發起 request
 
-	log.Println("insert log")
-	log.Println("insert log2")
-	log.Println("insert log3")
-
-	agent.JSON(Tracking{
-		Referrer: referrer,
-		Platform: "android",
-		Event:    "download",
-		Version:  version,
-		Uid1:     trackingIdentifier,
-		IP:       ip,
-	})
+	agent.JSON(track)
 
 	if err := agent.Parse(); err != nil {
 		fmt.Printf("[error] %v", err)
