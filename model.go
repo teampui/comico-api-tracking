@@ -1,33 +1,30 @@
 package tracking
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"time"
-
-	"github.com/gofiber/fiber/v2"
 )
 
 type Tracking struct {
-	ID          int64
-	Referrer    string
-	Platform    string
-	Event       string
-	EventSource string
-	Object      string
-	Uid1        string
-	Uid2        string
-	IP          string
-	Version     string
-	CreatedAt   time.Time
+	Referrer    string `json:"referrer"`
+	Platform    string `json:"platform"`
+	Event       string `json:"event"`
+	EventSource string `json:"event_source,omitempty"`
+	Object      string `json:"object,omitempty"`
+	Uid1        string `json:"uid1"`
+	Uid2        string `json:"uid2,omitempty"`
+	IP          string `json:"ip"`
+	Version     string `json:"version,omitempty"`
 }
 
 var (
 	authorization string
 	signature     string
 	host          string
-
-	agent *fiber.Agent
 )
 
 func init() {
@@ -46,24 +43,38 @@ func init() {
 		panic("TRACKING_HOST is not set")
 	}
 
-	agent = fiber.AcquireAgent()
-
-	req := agent.Request()
-	req.Header.Set("Authorization", authorization)
-	req.Header.Set("X-Comico-Signature", signature)
-	req.Header.SetMethod(fiber.MethodPost)
-	req.SetRequestURI(host + "/api/v1/logs")
 }
 
 func SendLog(track Tracking) {
 	// 發起 request
-
-	agent.JSON(track)
-
-	if err := agent.Parse(); err != nil {
+	jsonValue, err := json.Marshal(track)
+	if err != nil {
 		fmt.Printf("[error] %v", err)
 		return
 	}
 
-	_, _, _ = agent.String()
+	req, err := http.NewRequest(http.MethodPost, host+"/api/v1/logs", bytes.NewBuffer(jsonValue))
+	if err != nil {
+		fmt.Printf("[error] %v", err)
+		return
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", authorization)
+	req.Header.Set("X-Comico-Signature", signature)
+
+	// 逾時設定
+	timeout := 30 * time.Second
+
+	//adding the Transport object to the http Client
+	client := http.Client{
+		Timeout: timeout,
+	}
+
+	_, err = client.Do(req)
+	if err != nil {
+		fmt.Printf("[error] %v", err)
+		return
+	}
+
 }
