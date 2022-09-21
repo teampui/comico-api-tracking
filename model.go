@@ -2,6 +2,7 @@ package tracking
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -57,6 +58,8 @@ func init() {
 
 func SendLog(referrer string, ip string, trackingIdentifier string, version string) {
 	// 發起 request
+
+	log.Println("insert log")
 
 	agent.JSON(Tracking{
 		Referrer: referrer,
