@@ -60,6 +60,7 @@ func SendLog(referrer string, ip string, trackingIdentifier string, version stri
 	// 發起 request
 
 	log.Println("insert log")
+	log.Println("insert log2")
 
 	agent.JSON(Tracking{
 		Referrer: referrer,
