@@ -62,7 +62,7 @@ func SendLog(track Tracking) {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("KEY", key)
+	req.Header.Set("X-Comico-Key", key)
 	req.Header.Set("X-Comico-Signature", Signature())
 
 	// 逾時設定
