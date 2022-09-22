@@ -44,7 +44,6 @@ func init() {
 	if host == "" {
 		panic("TRACKING_HOST is not set")
 	}
-
 }
 
 func SendLog(track Tracking) {
