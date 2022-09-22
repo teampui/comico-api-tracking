@@ -30,17 +30,17 @@ var (
 )
 
 func init() {
-	key = os.Getenv("TRACKING_KEY")
+	key = os.Getenv("API_KEY")
 	if key == "" {
 		panic("TRACKING_KEY is not set")
 	}
 
-	secret = os.Getenv("TRACKING_SECRET")
+	secret = os.Getenv("API_SECRET")
 	if secret == "" {
 		panic("TRACKING_SECRET is not set")
 	}
 
-	host = os.Getenv("TRACKING_HOST")
+	host = os.Getenv("API_HOST")
 	if host == "" {
 		panic("TRACKING_HOST is not set")
 	}
