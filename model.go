@@ -23,33 +23,21 @@ type Tracking struct {
 	Version     string `json:"version,omitempty"`
 }
 
-var (
+type Client struct {
 	key    string
 	secret string
 	host   string
-)
-
-func init() {
-	key = "YOUR_KEY"
-	secret = "YOUR_SECRET"
-	host = "YOUR_HOST"
-	//key = os.Getenv("API_KEY")
-	//if key == "" {
-	//	panic("API_KEY is not set")
-	//}
-	//
-	//secret = os.Getenv("API_SECRET")
-	//if secret == "" {
-	//	panic("API_SECRET is not set")
-	//}
-	//
-	//host = os.Getenv("API_HOST")
-	//if host == "" {
-	//	panic("API_HOST is not set")
-	//}
 }
 
-func SendLog(track Tracking) {
+func NewClient(key, secret, host string) *Client {
+	return &Client{
+		key:    key,
+		secret: secret,
+		host:   host,
+	}
+}
+
+func (c *Client) SendLog(track Tracking) {
 	// 發起 request
 	jsonValue, err := json.Marshal(track)
 	if err != nil {
@@ -57,7 +45,7 @@ func SendLog(track Tracking) {
 		return
 	}
 
-	req, err := http.NewRequest(http.MethodPost, host+"/api/v1/logs", bytes.NewBuffer(jsonValue))
+	req, err := http.NewRequest(http.MethodPost, c.host+"/api/v1/logs", bytes.NewBuffer(jsonValue))
 	if err != nil {
 		fmt.Printf("[error] %v", err)
 		return
@@ -65,10 +53,10 @@ func SendLog(track Tracking) {
 
 	today := time.Now().UTC().Add(8 * time.Hour).Format("20060102")
 
-	signature := hmacSha256(secret, today)
+	signature := hmacSha256(c.secret, today)
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-Comico-Key", key)
+	req.Header.Set("X-Comico-Key", c.key)
 	req.Header.Set("X-Comico-Date", today)
 	req.Header.Set("X-Comico-Signature", signature)
 
