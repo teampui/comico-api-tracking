@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"crypto/hmac"
 	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 	"time"
 )
 
@@ -30,20 +30,23 @@ var (
 )
 
 func init() {
-	key = os.Getenv("API_KEY")
-	if key == "" {
-		panic("API_KEY is not set")
-	}
-
-	secret = os.Getenv("API_SECRET")
-	if secret == "" {
-		panic("API_SECRET is not set")
-	}
-
-	host = os.Getenv("API_HOST")
-	if host == "" {
-		panic("API_HOST is not set")
-	}
+	key = "YOUR_KEY"
+	secret = "YOUR_SECRET"
+	host = "YOUR_HOST"
+	//key = os.Getenv("API_KEY")
+	//if key == "" {
+	//	panic("API_KEY is not set")
+	//}
+	//
+	//secret = os.Getenv("API_SECRET")
+	//if secret == "" {
+	//	panic("API_SECRET is not set")
+	//}
+	//
+	//host = os.Getenv("API_HOST")
+	//if host == "" {
+	//	panic("API_HOST is not set")
+	//}
 }
 
 func SendLog(track Tracking) {
@@ -60,9 +63,14 @@ func SendLog(track Tracking) {
 		return
 	}
 
+	today := time.Now().UTC().Add(8 * time.Hour).Format("20060102")
+
+	signature := hmacSha256(secret, today)
+
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-Comico-Key", key)
-	req.Header.Set("X-Comico-Signature", Signature())
+	req.Header.Set("X-Comico-Date", today)
+	req.Header.Set("X-Comico-Signature", signature)
 
 	// 逾時設定
 	timeout := 30 * time.Second
@@ -80,12 +88,8 @@ func SendLog(track Tracking) {
 
 }
 
-func Signature() string {
-	hmacNew := hmac.New(sha256.New, []byte(key))
-	hmacNew.Write([]byte(secret))
-	return fmt.Sprintf("%x", hmacNew.Sum(nil))
-}
-
-func CheckSignature(signature string) bool {
-	return hmac.Equal([]byte(signature), []byte(Signature()))
+func hmacSha256(secret, data string) string {
+	mac := hmac.New(sha256.New, []byte(secret))
+	mac.Write([]byte(data))
+	return hex.EncodeToString(mac.Sum(nil))
 }
