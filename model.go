@@ -45,7 +45,7 @@ func (c *Client) SendLog(track Tracking) {
 		return
 	}
 
-	req, err := http.NewRequest(http.MethodPost, c.host+"/api/v1/logs", bytes.NewBuffer(jsonValue))
+	req, err := http.NewRequest(http.MethodPost, c.host+"/api/keyv1/logs", bytes.NewBuffer(jsonValue))
 	if err != nil {
 		fmt.Printf("[error] %v", err)
 		return
